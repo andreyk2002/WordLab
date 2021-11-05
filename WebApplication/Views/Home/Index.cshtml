@@ -1,0 +1,141 @@
+﻿@using Microsoft.Office.Interop.Word
+@using Tasks_Task = System.Threading.Tasks.Task
+@model WordDocModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+<link rel="stylesheet" src="~/css/style.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <h3 class="display-6">App writen by Kuksa Andrey, group 12, 3rd course</h3>
+    <p>Learn about <a href="https://dcs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <form method="post" asp-controller="Home" asp-action="ChangeRows">
+        <label>Chose number of table records</label>
+        <input type="number" value="1" name="rows" placeholder="change table rows">
+    </form>
+
+    <form method="post" asp-controller="Home" enctype="multipart/form-data">
+        <input type="file" id="upload" accept=".dot,.dotx" name="file"/>
+        <input type="hidden" name="filepath" id="filepath"/>
+        <br/>
+        <select class="w-50" name="sort">
+            <option value="Auditory">Auditory</option>
+            <option value="Tutor">Tutor</option>
+            <option value="StartDate">StartDate</option>
+            <option value="Group">Group</option>
+            <option value="Subject">Subject</option>
+            <option value="FailedPercent">FailedPercent</option>
+        </select>
+        <label>Sort descending</label>
+        <input type="checkbox" name="isDesc"/>
+        <button class="btn btn-primary mt-2 mb-5" type="submit" asp-action="SortRows">Sort</button>
+        <br/>
+        <input type="number" asp-for="@Model.CourseNumber" placeholder="enter group number"/>
+        <input type="number" asp-for="@Model.Semester" placeholder="enter semester number"/>
+        <input type="number" asp-for="@Model.Year" placeholder="enter start year">
+        <br/>
+        <input type="number" value="1" name="rowsCount" placeholder="change table rows">
+        <button class="btn-primary mt-2 mb-2" type="submit" asp-action="GenerateTable">Generate Data</button>
+        <button class="btn btn-primary mt-2 mb-5" type="submit" asp-action="CreateWordDocument">Create document</button>
+        <input type="hidden" value="1" name="rowsCount">
+        <table id="addTable" class="w-75">
+            <tr>
+                <th>Group</th>
+                <th>Subject</th>
+                <th>Tutor</th>
+                <th>Auditory</th>
+                <th>Begin Date</th>
+                <th>Failed Persentage</th>
+            </tr>
+            @{
+                int count = 1;
+                if (@ViewBag.Rows != null)
+                {
+                    count = @ViewBag.Rows;
+                }
+                for (int i = 0; i < count; i++)
+                {
+                    <tr>
+                        <td>
+                            @if (Model != null && Model.Items[i] != null)
+                            {
+                                <input asp-for="@Model.Items[i].Group" value="@Model.Items[i].Group" type="number" style="text-align:right;"/>
+                            }
+                            else
+                            {
+                                <input asp-for="@Model.Items[i].Group" type="number" style="text-align:right;"/>
+                            }
+                        </td>
+                        <td>
+                            @if (Model != null && Model.Items[i] != null)
+                            {
+                                <input asp-for="@Model.Items[i].Subject" value="@Model.Items[i].Subject" type="text"/>
+                            }
+                            else
+                            {
+                                <input asp-for="@Model.Items[i].Subject" type="text"/>
+                            }
+                        </td>
+                        <td>
+                            @if (Model != null && Model.Items[i] != null)
+                            {
+                                <input asp-for="@Model.Items[i].Tutor" value="@Model.Items[i].Tutor" type="text"/>
+                            }
+                            else
+                            {
+                                <input asp-for="@Model.Items[i].Tutor" type="text"/>
+                            }
+                        </td>
+                        <td>
+                            @if (Model != null && Model.Items[i] != null)
+                            {
+                                <input asp-for="@Model.Items[i].Auditory" value="@Model.Items[i].Auditory"
+                                       type="number" style="text-align:right;"/>
+                            }
+                            else
+                            {
+                                <input asp-for="@Model.Items[i].Auditory" type="number" style="text-align:right;"/>
+                            }
+                        </td>
+                        <td>
+                            @if (Model != null && Model.Items[i] != null)
+                            {
+                                <input my-date="@Model.Items[i].StartDate.ToString(format: "dd.MM.yyyy HH:mm")"
+                                       class="date" asp-for="@Model.Items[i].StartDate" type="datetime-local"
+                                       value="@Model.Items[i].StartDate.ToString(format: "s")" my-date-format="DD.MM.YYYY HH:mm"/>
+                            }
+                            else
+                            {
+                                <input my-date="" class="date" asp-for="@Model.Items[i].StartDate" type="datetime-local"
+                                       my-date-format="DD.MM.YYYY HH:mm"/>
+                            }
+                        </td>
+                        <td>
+                            @if (Model != null && Model.Items[i] != null)
+                            {
+                                <input asp-for="@Model.Items[i].FailedPercent" value="@Model.Items[i].FailedPercent" type="number" step="0.01" style="text-align:right;"/>
+                            }
+                            else
+                            {
+                                <input asp-for="@Model.Items[i].FailedPercent" type="number" step="0.01" style="text-align:right;"/>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </table>
+
+    </form>
+
+</div>
+<script type="text/javascript">    
+    document.getElementById('upload').addEventListener("change", function (event){
+         let path = URL.createObjectURL(event.target.files[0]);
+         console.log(path);
+         document.getElementById('filepath').value = path;
+        })
+
+</script>
